@@ -1,4 +1,4 @@
-# Astro Starter Kit: Blog
+# NetCraft Studio
 
 ```sh
 pnpm create astro@latest -- --template blog

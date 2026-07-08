@@ -1,0 +1,15 @@
+# 所有文本文件在检出时自动转为系统默认换行符，提交时统一为 LF
+* text=auto
+
+# 或者明确指定某些文件类型始终使用 LF（适合跨平台项目）
+*.js    text eol=lf
+*.ts    text eol=lf
+*.json  text eol=lf
+*.yaml  text eol=lf
+*.css   text eol=lf
+*.md    text eol=lf
+*.astro text eol=lf
+
+# 二进制文件不做转换
+*.png binary
+*.jpg binary

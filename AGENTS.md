@@ -1,22 +1,11 @@
-## Development
+# 项目指南
 
-When starting the dev server, use background mode:
+## 语言规范
+- 所有对话和文档都使用中文
+- 注释使用中文
+- 错误提示使用中文
+- 文档使用中文Markdown格式
 
-```
-astro dev --background
-```
-
-Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
-
-## Documentation
-
-Full documentation: https://docs.astro.build
-
-Consult these guides before working on related tasks:
-
-- [Adding pages, dynamic routes, or middleware](https://docs.astro.build/en/guides/routing/)
-- [Working with Astro components](https://docs.astro.build/en/basics/astro-components/)
-- [Using React, Vue, Svelte, or other framework components](https://docs.astro.build/en/guides/framework-components/)
-- [Adding or managing content](https://docs.astro.build/en/guides/content-collections/)
-- [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
-- [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
+## 修改规范
+- 每次更改代码后，必须重新检查受影响的文件，排除因本次修改引入的错误（如语法错误、类型不匹配、未引用的变量、破坏的依赖关系等）
+- 检查范围包括：直接修改的文件、调用方文件、以及被修改函数/组件所影响的相关模块
