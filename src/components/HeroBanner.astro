@@ -1,0 +1,144 @@
+---
+// HeroBanner.astro
+// 滚动时缩放并产生底部圆角的 Hero 容器
+
+export interface Props {
+  /** 缩放起始值，默认 1 */
+  scaleStart?: number;
+  /** 缩放结束值，默认 0.9551 */
+  scaleEnd?: number;
+  /** 底部圆角起始值 (px)，默认 0 */
+  radiusStart?: number;
+  /** 底部圆角结束值 (px)，默认 40 */
+  radiusEnd?: number;
+  /** 变换完成的滚动距离 (px)，默认视口高度 */
+  maxScroll?: number;
+}
+
+const {
+  scaleStart = 1,
+  scaleEnd = 0.9551,
+  radiusStart = 0,
+  radiusEnd = 40,
+  maxScroll = 0, // 0 表示动态使用 window.innerHeight
+} = Astro.props
+---
+
+<!--
+  外层 div 必须同时设置 id="hero-banner"（脚本查找用）和 class="hero-banner"（样式用）。
+  通过 data-* 属性将 Astro props 传递到客户端脚本，dataset 读取时保证值存在。
+-->
+<div
+  id="hero-banner"
+  class="hero-banner"
+  data-scale-start={scaleStart}
+  data-scale-end={scaleEnd}
+  data-radius-start={radiusStart}
+  data-radius-end={radiusEnd}
+  data-max-scroll={maxScroll}
+>
+  <!-- 背景图片/视频通过插槽传入 -->
+  <div class="hero-background">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .hero-banner {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    z-index: 1; /* 与正文同层，低于吸顶 Header */
+
+    /* 默认样式 */
+    transform: scale(1);
+    transform-origin: center top; /* 缩放时顶部对齐，向下收缩露出圆角 */
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    will-change: transform, border-radius;
+    overflow: hidden; /* 防止内容溢出 */
+    background-color: #0bd1db; /* 备用背景色，可被插槽内容覆盖 */
+  }
+
+  .hero-background {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 插槽内图片/视频自动填满 */
+  .hero-background :is(img, video) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+</style>
+
+<script>
+  // 客户端脚本：监听滚动事件，动态调整 Hero 容器的缩放和底部圆角
+  (function () {
+    // 查找外层 div，id 在 HTML 中已设置
+    var heroBanner = document.getElementById('hero-banner');
+    if (!heroBanner) return;
+
+    // 在 null 检查后提取一份引用，确保后续闭包中类型被正确窄化
+    var el = heroBanner;
+
+    // 从 data-* 属性读取配置。dataset 返回 string|undefined，通过 || '' 先转为 string，
+    // parseFloat('') → NaN，NaN || fallback → fallback，同时 TS 也能正确推断类型。
+    var scaleStart = parseFloat(el.dataset.scaleStart || '') || 1;
+    var scaleEnd = parseFloat(el.dataset.scaleEnd || '') || 0.9551;
+    var radiusStart = parseFloat(el.dataset.radiusStart || '') || 0;
+    var radiusEnd = parseFloat(el.dataset.radiusEnd || '') || 40;
+
+    // maxScroll：若未显式设置或为 0，则使用视口高度
+    var rawMax = parseFloat(el.dataset.maxScroll || '');
+    var maxScroll = rawMax || window.innerHeight;
+
+    var scaleDelta = scaleStart - scaleEnd;
+    var radiusDelta = radiusEnd - radiusStart;
+
+    function updateBanner(scrollY = 0) {
+      var progress = Math.min((scrollY || 0) / maxScroll, 1);
+      var currentScale = scaleStart - scaleDelta * progress;
+      var currentRadius = radiusStart + radiusDelta * progress;
+
+      el.style.transform = 'scale(' + currentScale + ')';
+      el.style.borderBottomRightRadius = currentRadius + 'px';
+      el.style.borderBottomLeftRadius = currentRadius + 'px';
+    }
+
+    var ticking = false;
+    function onScroll() {
+      if (!ticking) {
+        window.requestAnimationFrame(function () {
+          var scrollY = window.pageYOffset || window.scrollY || 0;
+          updateBanner(scrollY);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
+
+    function onResize() {
+      // 仅当用户未显式设置 maxScroll 时，才随窗口大小动态更新
+      var dataMax = parseFloat(el.dataset.maxScroll || '');
+      if (!dataMax) {
+        maxScroll = window.innerHeight;
+      }
+      // 刷新当前滚动位置的样式
+      var scrollY = window.pageYOffset || window.scrollY || 0;
+      updateBanner(scrollY);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
+
+    // 初始更新（修正：pageXOffset 为水平滚动，此处需要垂直滚动 pageYOffset）
+    var initScroll = window.pageYOffset || window.scrollY || 0;
+    updateBanner(initScroll);
+  })();
+</script>

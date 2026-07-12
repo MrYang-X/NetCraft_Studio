@@ -49,6 +49,9 @@ import HeaderLink from './HeaderLink.astro';
 		padding: 0 1em;
 		background: white;
 		box-shadow: 0 2px 8px rgba(var(--black), 5%);
+		position: sticky;
+		top: 0;
+		z-index: 10; /* 高于 HeroBanner，滚动时覆盖横幅 */
 	}
 	h2 {
 		margin: 0;

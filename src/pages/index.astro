@@ -1,8 +1,11 @@
 ---
+import { Image } from 'astro:assets';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import Loader from '../components/Loader.astro';
+import HeroBanner from '../components/HeroBanner.astro';
+import heroImage from '../assets/Travel-with-you.png';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 ---
 
@@ -14,6 +17,14 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 	<body>
 		<Loader />
 		<Header />
+		<HeroBanner
+			scaleEnd={0.9551}
+			radiusEnd={40}
+			maxScroll={0}
+		>
+			<Image src={heroImage} alt="Travel with you" class="hero-image" />
+		</HeroBanner>
+
 		<main transition:animate="fade">
 			<h1>🧑‍🚀 Hello, Astronaut!</h1>
 			<p>
